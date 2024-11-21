@@ -9,3 +9,13 @@ exports.createRestaurant = async (req, res, next) => {
         res.status(400).json({ message: error.message });
     }
 };
+
+exports.getRestaurant = async (req, res, next) => {
+    try {
+        const restaurants = await restaurantModel.find({});
+        res.status(200).json(restaurants);
+    } catch (err) {
+        next(err);
+    }
+};
+

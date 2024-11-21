@@ -1,9 +1,12 @@
 const restaurantModel = require('../../models/restaurant');
 const httpMocks = require('node-mocks-http');
 const newRestaurant = require('../mock-data/new-restaurant.json');
-const restaurantController = require('../../controllers/todo.controller'); 
+const restaurantController = require('../../controllers/restaurant.controller'); 
+const allRestaurants = require("../mock-data/all-restaurant.json")
 
 restaurantModel.prototype.save = jest.fn();
+restaurantModel.create = jest.fn();
+restaurantModel.find = jest.fn();
 
 let req, res, next;
 
@@ -47,5 +50,24 @@ describe('RestaurantController.createRestaurant', () => {
         await restaurantController.createRestaurant(req, res, next);
         expect(res.statusCode).toBe(400);
         expect(res._getJSONData()).toStrictEqual({ message: 'Error saving restaurant' });
+    });
+});
+
+describe('restaurantController.getRestaurant', () => {
+    it("should have a getRestaurants function", () => {
+        expect(typeof restaurantController.getRestaurant).toBe("function");
+    });
+
+    if("should call restaurantModel.find({})", async () => {
+        await restaurantController.getRestaurant(res, req, next);
+        expect(restaurantModel.find).toHaveBeenCalledWith({});
+    });
+
+    it("should handle errors in getRestaurants", async () => {
+        const errorMessage = {message: "Error finding"}
+        const rejectedPromise = Promise.reject(errorMessage)
+        restaurantModel.find.mockReturnValue(rejectedPromise)
+        await restaurantController.getRestaurant(req, res, next)
+        expect(next).toBeCalledWith(errorMessage)
     });
 });
